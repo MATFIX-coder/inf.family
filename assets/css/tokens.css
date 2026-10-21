@@ -1,0 +1,156 @@
+/* Дизайн-токены inf.family: цвета, шрифты, размеры. Светлая и тёмная темы.
+   Тема задаётся атрибутом data-theme на <html>; без него — по настройке системы. */
+
+:root {
+  /* Цвета разделов — одинаковые в обеих темах. Текст на них всегда --ink. */
+  --violet: #8b6cff;
+  --yellow: #ffd84d;
+  --mint: #7ee0a8;
+  --coral: #ff8a7a;
+  --sky: #4cc9e0;
+  --lilac: #e7a6f5;
+  --peach: #ffc99a;
+  --lime: #c6f36b;
+  --ink: #16141a;
+  --ink-soft: rgba(22, 20, 26, 0.72);
+
+  /* «Экраны» — код, терминал, Arcade. Тёмные в обеих темах. */
+  --screen: #121016;
+  --screen-2: #1c1a21;
+  --screen-line: #2f2c37;
+  --screen-text: #f4f2ee;
+  --screen-dim: #8e8a99;
+  --hl-string: #ffd84d;
+  --hl-number: #ff9e8f;
+  --hl-keyword: #b9a6ff;
+  --hl-builtin: #6fd6ea;
+  --hl-comment: #8a8596;
+
+  /* Шрифты */
+  --font-display: 'Unbounded', 'Segoe UI', system-ui, sans-serif;
+  --font-text: 'Onest', 'Segoe UI', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  --font-hand: 'Caveat', 'Segoe Print', cursive;
+
+  /* Размеры текста: шкала ~1.25, крупные — тянутся с шириной экрана */
+  --fs-xs: 0.8125rem;   /* 13 */
+  --fs-sm: 0.9375rem;   /* 15 */
+  --fs-md: 1.0625rem;   /* 17 — основной текст */
+  --fs-lg: 1.3125rem;   /* 21 */
+  --fs-xl: clamp(1.5rem, 1.2rem + 1vw, 1.875rem);
+  --fs-2xl: clamp(1.875rem, 1.3rem + 2.2vw, 2.75rem);
+  --fs-hero: clamp(2.25rem, 1.2rem + 4.4vw, 4.5rem);
+
+  /* Отступы: шаг 4 px */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px; --s9: 112px;
+
+  /* Скругления по иерархии: мелочь — карточка — панель — таблетка */
+  --r-sm: 10px;
+  --r-md: 18px;
+  --r-lg: 28px;
+  --r-pill: 999px;
+
+  --page-max: 1200px;
+  --gutter: clamp(16px, 4vw, 40px);
+
+  /* Движение */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 140ms;
+  --t-base: 260ms;
+  --t-slow: 520ms;
+}
+
+/* ---------- Светлая тема: холодный сиреневый, не кремовый ---------- */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg-top: #ffffff;
+  --bg-bottom: #e9e6f3;
+  --surface: #ffffff;
+  --surface-2: #f2f0f8;
+  --surface-3: #e8e5f2;
+  --line: #e1ddeb;
+  --line-strong: #c9c3db;
+  --text: #16141a;
+  --text-2: #57536a;
+  --text-3: #66627a;
+  --brand: #0f6e75;          /* бирюзовый логотипа, затемнён для текста */
+  --brand-deco: #1fa3ad;     /* яркий — только для декора */
+  --focus: #5a3ee0;
+  --ok: #136b42;
+  --ok-bg: #def5e8;
+  --bad: #b8392a;
+  --bad-bg: #fde6e2;
+  --hint-bg: #fff3c4;
+  --code-inline-bg: #ebe8f5;
+  --shadow-card: 0 1px 0 rgba(22, 20, 26, 0.05), 0 10px 24px -14px rgba(40, 30, 80, 0.28);
+  --shadow-lift: 0 24px 48px -20px rgba(40, 30, 80, 0.45);
+  --spark: rgba(90, 62, 224, 0.18);
+  --logo-mark: url('../img/brand/logo-mark.webp');
+}
+
+/* ---------- Тёмная тема: градиент снизу вверх, от тёмно-серого к чёрному ---------- */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-top: #08070b;
+  --bg-bottom: #2a2730;
+  --surface: #1c1a21;
+  --surface-2: #24212a;
+  --surface-3: #2d2a34;
+  --line: #34313c;
+  --line-strong: #4a4654;
+  --text: #f4f2ee;
+  --text-2: #b9b5c4;
+  --text-3: #9a96a8;
+  --brand: #3cc3cd;
+  --brand-deco: #1fa3ad;
+  --focus: #c6f36b;
+  --ok: #8fe8b4;
+  --ok-bg: rgba(126, 224, 168, 0.13);
+  --bad: #ff9e8f;
+  --bad-bg: rgba(255, 138, 122, 0.13);
+  --hint-bg: rgba(255, 216, 77, 0.12);
+  --code-inline-bg: #2d2a34;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 16px 32px -20px rgba(0, 0, 0, 0.8);
+  --shadow-lift: 0 30px 60px -24px rgba(0, 0, 0, 0.9);
+  --spark: rgba(244, 242, 238, 0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg-top: #08070b;
+    --bg-bottom: #2a2730;
+    --surface: #1c1a21;
+    --surface-2: #24212a;
+    --surface-3: #2d2a34;
+    --line: #34313c;
+    --line-strong: #4a4654;
+    --text: #f4f2ee;
+    --text-2: #b9b5c4;
+    --text-3: #9a96a8;
+    --brand: #3cc3cd;
+    --brand-deco: #1fa3ad;
+    --focus: #c6f36b;
+    --ok: #8fe8b4;
+    --ok-bg: rgba(126, 224, 168, 0.13);
+    --bad: #ff9e8f;
+    --bad-bg: rgba(255, 138, 122, 0.13);
+    --hint-bg: rgba(255, 216, 77, 0.12);
+    --code-inline-bg: #2d2a34;
+    --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 16px 32px -20px rgba(0, 0, 0, 0.8);
+    --shadow-lift: 0 30px 60px -24px rgba(0, 0, 0, 0.9);
+    --spark: rgba(244, 242, 238, 0.16);
+  }
+}
+
+/* Цвет раздела для компонента: <div data-tone="mint"> */
+[data-tone='violet'] { --tone: var(--violet); }
+[data-tone='yellow'] { --tone: var(--yellow); }
+[data-tone='mint'] { --tone: var(--mint); }
+[data-tone='coral'] { --tone: var(--coral); }
+[data-tone='sky'] { --tone: var(--sky); }
+[data-tone='lilac'] { --tone: var(--lilac); }
+[data-tone='peach'] { --tone: var(--peach); }
+[data-tone='lime'] { --tone: var(--lime); }

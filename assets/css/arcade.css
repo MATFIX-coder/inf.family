@@ -1,0 +1,216 @@
+/* Python Arcade — зал игровых автоматов. Внутри «экранов» всегда тёмная палитра. */
+
+.arcade-screen {
+  --surface: #1c1a21;
+  --surface-2: #24212a;
+  --surface-3: #2d2a34;
+  --line: #34313c;
+  --line-strong: #4a4654;
+  --text: #f4f2ee;
+  --text-2: #b9b5c4;
+  --text-3: #9a96a8;
+  --code-inline-bg: #2d2a34;
+  --focus: #c6f36b;
+  --brand: #3cc3cd;
+  --ok: #8fe8b4;
+  --ok-bg: rgba(126, 224, 168, 0.13);
+  --bad: #ff9e8f;
+  --bad-bg: rgba(255, 138, 122, 0.13);
+  --hint-bg: rgba(255, 216, 77, 0.12);
+  color: var(--text);
+}
+.ar-dim { color: var(--screen-dim); }
+.ar-btn-light { border-color: #4a4654; color: #f4f2ee; }
+.ar-btn-light:hover { background: #2d2a34; }
+.btn--tone svg { width: 18px; height: 18px; }
+
+/* ---------- Зал ---------- */
+.ar-hall { padding-top: var(--s5); }
+.ar-hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--s6); align-items: center; padding: clamp(24px, 4vw, 48px); }
+.ar-hero h1 { margin-top: var(--s4); font-size: var(--fs-hero); }
+.ar-hero p { margin-top: var(--s3); color: var(--text-2); }
+.ar-hero__side { display: grid; justify-items: start; gap: var(--s3); }
+.tokens--big { gap: 10px; }
+.tokens--big .token { width: 40px; height: 40px; }
+.ar-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s2); margin: 0; width: 100%; }
+.ar-stats div { padding: 10px 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.05); }
+.ar-stats dt { font-size: var(--fs-xs); color: var(--screen-dim); }
+.ar-stats dd { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; }
+
+.coverflow--arcade { --cf-w: clamp(150px, 19vw, 230px); }
+.cover--robot { padding: 14px; align-items: center; }
+.cover--robot .cover__meta { align-self: flex-start; }
+.cover__robot { flex: 1; min-height: 0; width: 86%; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.28)); pointer-events: none; }
+.cover--robot .cover__title { align-self: flex-start; }
+.pips--light { justify-content: center; margin-top: var(--s3); }
+.pips--light i { border-color: var(--text); width: 12px; height: 12px; }
+.pips--light i.is-on { background: var(--text); }
+
+.ar-boss { margin-top: var(--s7); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--s4); padding: var(--s5) var(--s6); border: 1.5px solid #3a3644; }
+.ar-boss.is-open { border-color: var(--yellow); box-shadow: 0 0 0 4px rgba(255, 216, 77, 0.08); }
+.ar-boss__lock { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 18px; background: rgba(255, 216, 77, 0.12); color: var(--yellow); }
+.ar-boss__lock svg { width: 28px; height: 28px; }
+.ar-boss h2 { font-size: var(--fs-xl); }
+.ar-bonus { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s3); }
+.ar-bonus .block-card { min-height: 150px; }
+.ar-settings { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3) var(--s5); align-items: center; margin-top: var(--s7); padding: var(--s5); border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+.ar-settings > p { grid-column: 1 / -1; }
+
+/* ---------- Автомат ---------- */
+.ar-station { padding-top: var(--s5); }
+.ar-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3); }
+.ar-top .back-link { margin-top: 0; }
+.ar-layout { display: grid; grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr); gap: var(--s5); margin-top: var(--s4); align-items: start; }
+.ar-robot { position: sticky; top: var(--s4); display: grid; gap: var(--s3); justify-items: center; padding: var(--s5); border-radius: var(--r-lg); background: var(--tone); color: var(--ink); text-align: center; overflow: hidden; }
+.ar-robot__art img { width: min(100%, 300px); height: auto; filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.3)); }
+.ar-robot p { font-weight: 600; font-size: var(--fs-sm); }
+.ar-robot .pips i { width: 14px; height: 14px; }
+.ar-panel { padding: clamp(20px, 3vw, 32px); min-height: 420px; }
+.ar-kicker { font-size: var(--fs-sm); font-weight: 600; color: var(--tone); }
+.ar-panel h1 { font-size: var(--fs-2xl); margin: 4px 0 var(--s5); }
+.ar-chip { background: rgba(255, 255, 255, 0.06); border-color: transparent; color: var(--text-2); }
+.ar-prompt { font-size: var(--fs-lg); line-height: 1.45; }
+.ar-target { background: var(--yellow); color: var(--ink); }
+.ar-task { margin-top: var(--s4); }
+.ar-feedback { display: flex; gap: 10px; align-items: flex-start; margin-top: var(--s4); font-weight: 600; min-height: 1.5em; }
+.ar-feedback:empty { display: none; }
+.ar-feedback svg { width: 22px; height: 22px; flex: none; }
+.ar-feedback.is-good { color: var(--ok); }
+.ar-feedback.is-bad { color: var(--bad); }
+.ar-explain:not(:empty) { margin-top: var(--s4); }
+.ar-explain .explain { box-shadow: none; }
+.ar-teacher { margin-top: var(--s5); padding: var(--s4); border-radius: var(--r-md); border: 1.5px dashed #4a4654; }
+.ar-solution { margin: var(--s3) 0 0; padding: var(--s3); border-radius: 12px; background: #0e0d12; font-family: var(--font-code); font-size: var(--fs-sm); white-space: pre-wrap; }
+
+.ar-form .answer-row { gap: var(--s2); }
+.ar-field { font-family: var(--font-code); }
+.ar-terminal { margin-top: var(--s3); padding: 12px 16px; border-radius: 14px; background: #0b0a0e; border: 1px solid var(--screen-line); font-family: var(--font-code); font-size: 0.95rem; color: #8fe8b4; }
+.ar-terminal__prompt { color: var(--screen-dim); }
+.ar-terminal.is-running [data-out] { animation: blink 0.6s steps(2) infinite; color: var(--screen-dim); }
+@keyframes blink { 50% { opacity: 0.3; } }
+.ar-editor {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid var(--line-strong);
+  background: #0e0d12;
+  color: var(--screen-text);
+  font-family: var(--font-code);
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: vertical;
+  tab-size: 4;
+}
+.ar-editor:focus-visible { outline: none; border-color: var(--focus); }
+
+/* Колесо */
+.ar-wheel { position: relative; width: min(100%, 340px); margin: var(--s4) auto 0; aspect-ratio: 1; }
+.ar-wheel__disc { width: 100%; height: 100%; transition: transform 2.5s cubic-bezier(0.17, 0.67, 0.12, 1); filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.5)); }
+.ar-wheel__disc text { font-family: var(--font-display); font-size: 12px; font-weight: 700; fill: #16141a; }
+.ar-wheel__disc .ar-wheel__hub { fill: #f4f2ee; font-family: var(--font-code); font-size: 16px; }
+.ar-wheel__pointer { position: absolute; left: 50%; top: -6px; z-index: 2; width: 0; height: 0; margin-left: -14px; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 26px solid #f4f2ee; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.4)); }
+
+/* Слот-машина */
+.ar-slots { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin-top: var(--s4); padding: var(--s4); border-radius: 22px; background: linear-gradient(#ffd84d, #f2b632); }
+.ar-reel { display: grid; justify-items: center; gap: 4px; padding: var(--s5) var(--s3); border-radius: 16px; background: #fff8dc; color: var(--ink); box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.18); overflow: hidden; }
+.ar-reel small { font-size: var(--fs-xs); font-weight: 600; color: var(--ink-soft); }
+.ar-reel strong { font-family: var(--font-display); font-size: clamp(1.1rem, 0.8rem + 1.2vw, 1.6rem); }
+.ar-reel.is-spinning strong { filter: blur(1.5px); animation: reel 0.12s linear infinite; }
+@keyframes reel { from { transform: translateY(-6px); } to { transform: translateY(6px); } }
+
+/* Срезы и тир */
+.ar-strip .strip__cell b { width: 40px; height: 48px; font-size: 1.2rem; }
+.ar-strip .strip__cell.is-on b { background: var(--tone); color: var(--ink); border-color: transparent; transform: translateY(-3px); }
+.ar-strip .strip__cell.is-hit b { background: var(--yellow); color: var(--ink); border-color: transparent; transform: translateY(-4px) scale(1.06); box-shadow: 0 0 0 4px rgba(255, 216, 77, 0.25); }
+.ar-slice-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); }
+.ar-control { display: grid; gap: 6px; padding: 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.ar-control > label:first-child { font-family: var(--font-code); font-weight: 700; color: var(--tone); }
+.ar-null { display: flex; gap: 6px; align-items: center; font-size: var(--fs-xs); color: var(--text-2); }
+.ar-slice-result { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); padding: 12px 16px; border-radius: 14px; background: #0b0a0e; font-family: var(--font-code); }
+.ar-slice-result strong { color: var(--yellow); }
+.ar-range { width: 100%; accent-color: var(--tone); }
+input[type='range'] { accent-color: var(--tone, var(--text)); }
+
+/* Конструктор */
+.ar-order .order__text { font-family: var(--font-code); }
+
+/* Сейф */
+.ar-safe-tasks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
+.ar-safe-task { display: grid; gap: 8px; padding: 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.ar-safe-task label { font-weight: 600; font-size: var(--fs-sm); color: var(--text-2); }
+.ar-safe-task.is-open { border-color: var(--lime); }
+.ar-safe-status { color: var(--lime); font-family: var(--font-code); font-weight: 700; }
+.ar-vault { display: grid; justify-items: center; gap: var(--s3); margin-top: var(--s4); padding: var(--s5); border-radius: 26px; background: radial-gradient(circle at 50% 30%, #3a3644, #1c1a21 70%); border: 3px solid #4a4654; transition: border-color var(--t-base), box-shadow var(--t-base); }
+.ar-vault.is-open { border-color: var(--lime); box-shadow: 0 0 0 6px rgba(198, 243, 107, 0.15); }
+.ar-pin { display: flex; gap: 8px; }
+.ar-pin span { display: grid; place-items: center; width: 48px; height: 56px; border-radius: 12px; background: #0b0a0e; font-family: var(--font-code); font-size: 1.6rem; font-weight: 700; color: var(--lime); }
+.ar-keypad { display: grid; grid-template-columns: repeat(3, 64px); gap: 8px; }
+.ar-keypad button { height: 52px; border-radius: 14px; border: 0; background: #2d2a34; color: #f4f2ee; font-family: var(--font-code); font-size: 1.25rem; font-weight: 700; }
+.ar-keypad button:hover { background: #3a3644; }
+.ar-keypad button[data-key='✓'] { background: var(--lime); color: var(--ink); }
+
+/* Детектив */
+.ar-suspects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); }
+.ar-suspect { display: grid; gap: 10px; justify-items: start; padding: 14px; border-radius: 18px; border: 2px solid transparent; background: var(--tone); color: var(--ink); text-align: left; }
+.ar-suspect code { display: block; width: 100%; padding: 10px; border-radius: 12px; background: #0e0d12; color: var(--screen-text); font-family: var(--font-code); font-size: 0.85rem; white-space: pre-wrap; }
+.ar-suspect .cabinet__face { width: 100%; height: 48px; }
+.ar-suspect.is-picked { border-color: #f4f2ee; }
+
+/* Машина замен и конвейер */
+.ar-replace-code b { color: var(--yellow); }
+.ar-replace-result { font-size: 1.25rem; color: var(--screen-text) !important; }
+.ar-replace-result mark { padding: 1px 4px; border-radius: 5px; background: var(--yellow); color: var(--ink); }
+.ar-conveyor { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px; border-radius: 16px; background: repeating-linear-gradient(90deg, #24212a 0 14px, #1c1a21 14px 28px); }
+.ar-conveyor span { padding: 8px 12px; border-radius: 12px; background: var(--yellow); color: var(--ink); font-family: var(--font-code); font-weight: 700; }
+.ar-conveyor b { color: var(--yellow); }
+
+/* Весы */
+.ar-scales { position: relative; height: 170px; margin-top: var(--s4); }
+.ar-scales__beam { position: absolute; left: 6%; right: 6%; top: 40px; display: flex; justify-content: space-between; height: 8px; border-radius: 9px; background: #f4f2ee; transition: transform var(--t-slow) var(--ease-spring); }
+.ar-pan { margin-top: 14px; padding: 12px 16px; border-radius: 0 0 18px 18px; background: var(--coral); color: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: clamp(0.9rem, 0.7rem + 0.8vw, 1.2rem); white-space: nowrap; }
+.ar-scales__stand { position: absolute; left: 50%; top: 44px; width: 10px; height: 110px; margin-left: -5px; background: #4a4654; border-radius: 6px; }
+.ar-scales[data-tilt='left'] .ar-scales__beam { transform: rotate(-7deg); }
+.ar-scales[data-tilt='right'] .ar-scales__beam { transform: rotate(7deg); }
+.ar-sign { min-width: 72px; font-family: var(--font-code); font-size: 1.4rem; }
+
+/* Лупа */
+.ar-pixel-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
+.ar-pixel-pair figure { margin: 0; display: grid; gap: 8px; justify-items: center; }
+.ar-pixel-pair figcaption { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-xl); }
+.ar-pixel-box { --zoom: 1; display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 18px; background: #f4f2ee; overflow: hidden; }
+.ar-pixel-box canvas, .ar-pixel-box svg { width: calc(36px * var(--zoom)); height: calc(36px * var(--zoom)); image-rendering: pixelated; transition: width var(--t-fast), height var(--t-fast); }
+
+/* Финал */
+.ar-finish { display: grid; grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr); gap: var(--s6); align-items: center; margin-top: var(--s5); padding: clamp(24px, 4vw, 48px); }
+.ar-finish__robot { width: 100%; height: auto; max-height: 420px; object-fit: contain; }
+.ar-finish h1 { font-size: var(--fs-2xl); }
+
+/* Жетон падает к роботу */
+.ar-token-drop { position: absolute; left: 50%; top: 0; pointer-events: none; animation: drop 1.4s var(--ease-spring) forwards; }
+.ar-token-drop .token { width: 64px; height: 64px; }
+@keyframes drop { 0% { transform: translate(-50%, -80px) scale(0.6); opacity: 0; } 40% { opacity: 1; } 70% { transform: translate(-50%, 40px) scale(1.1); } 100% { transform: translate(-50%, 30px) scale(1); opacity: 0; } }
+
+@media (max-width: 980px) {
+  .ar-bonus { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ar-layout { grid-template-columns: minmax(0, 1fr); }
+  .ar-robot { position: static; grid-template-columns: auto minmax(0, 1fr); text-align: left; justify-items: start; align-items: center; }
+  .ar-robot__art img { width: 120px; }
+  .ar-robot .pips { grid-column: 2; }
+}
+@media (max-width: 760px) {
+  .ar-hero, .ar-finish { grid-template-columns: minmax(0, 1fr); }
+  .ar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ar-boss { grid-template-columns: auto minmax(0, 1fr); }
+  .ar-boss > .btn { grid-column: 1 / -1; justify-self: start; }
+  .ar-bonus { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ar-settings { grid-template-columns: minmax(0, 1fr); }
+  .ar-slice-controls, .ar-safe-tasks, .ar-suspects { grid-template-columns: minmax(0, 1fr); }
+  .ar-finish__robot { max-height: 220px; }
+}
+
+/* Поле ввода в узкой карточке сейфа: сжимается, кнопка не вылезает */
+.ar-safe-task { grid-template-columns: minmax(0, 1fr); }
+.ar-safe-task .answer-row { gap: 6px; }
+.ar-safe-task .field { width: 0; min-width: 0; }
+.ar-safe-task .btn { min-height: 44px; padding: 0 14px; }
