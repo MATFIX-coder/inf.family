@@ -30,6 +30,7 @@
   // Обложки защит (выбор пользователя 21.10.2026; старый постер остаётся в данных как материал)
   INF.defenseLook = {
     'defense-september': { cover: 'assets/img/defenses/september-cover-v2.webp', square: 'assets/img/defenses/september-cover-v2-square.webp' },
+    'defense-october': { cover: 'assets/img/defenses/october-cover.webp', square: 'assets/img/defenses/october-cover-square.webp' },
   };
   INF.coverOf = d => (INF.defenseLook[d.id] || { cover: d.poster, square: d.poster });
 

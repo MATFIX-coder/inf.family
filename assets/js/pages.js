@@ -46,17 +46,27 @@
   function trainerGrid() {
     return `<div class="t-grid">${INF.trainers.filter(t => t.kind === 'block').map(t => trainerCard(t)).join('')}</div>`;
   }
-  // Защита месяца и игра — отдельные разделы, на главной показываются под тренажёрами
+  // Состав защиты словами: «тест по срезам и две задачи», «четыре задачи»
+  function defenseParts(d) {
+    const tests = d.modules.filter(m => m.type !== 'image'), tasks = d.modules.length - tests.length;
+    const num = ['', 'одна', 'две', 'три', 'четыре', 'пять', 'шесть'][tasks] || String(tasks);
+    const word = tasks === 1 ? 'задача' : tasks > 1 && tasks < 5 ? 'задачи' : 'задач';
+    return [...tests.map(m => m.name.toLowerCase()), tasks ? `${num} ${word}` : ''].filter(Boolean).join(' и ');
+  }
+  const hasTest = d => d.modules.some(m => m.type !== 'image');
+
+  // Защита месяца и игра — отдельные разделы, на главной показываются под тренажёрами.
+  // Из защит на главной — только текущая (первая в списке), остальные в разделе «Защиты».
   function extraCards() {
     const ar = INF.arcade.summary();
+    const d = D.defenses[D.catalog.defenseOrder[0]];
     return `<div class="x-grid">
-      ${D.catalog.defenseOrder.map(id => { const d = D.defenses[id]; return `
-      <a class="block-card block-card--calm block-card--thumb" data-tone="peach" href="#/defense/${id}">
+      <a class="block-card block-card--calm block-card--thumb" data-tone="peach" href="#/defense/${d.id}">
         <span class="block-card__meta">Защита месяца</span><span class="block-card__title">${esc(d.name)}</span>
-        <span class="t-card__desc">Проверка знаний за месяц: тест по срезам и две задачи. Готовиться можно заранее.</span>
+        <span class="t-card__desc">Проверка знаний за месяц: ${esc(defenseParts(d))}. Готовиться можно заранее.</span>
         <img class="block-card__thumb" src="${esc(INF.coverOf(d).square)}" alt="" width="160" height="160">
         <span class="t-card__foot"><span class="t-card__row">${cta('Открыть')}</span></span>
-      </a>`; }).join('')}
+      </a>
       <a class="block-card block-card--night block-card--thumb" href="#/arcade">
         <span class="block-card__meta">Игра</span><span class="block-card__title">Python Arcade</span>
         <span class="t-card__desc">8 игровых автоматов с заданиями. За каждый — жетон, 8 жетонов открывают финальный уровень.</span>
@@ -250,7 +260,7 @@
       <div class="defense-list">${D.catalog.defenseOrder.map(id => { const d = D.defenses[id]; return `
         <a class="defense-card" href="#/defense/${id}">
           <img src="${esc(INF.coverOf(d).cover)}" alt="Обложка: ${esc(d.name)}" width="840" height="1050">
-          <span class="defense-card__body"><span class="sticker" data-tone="peach">${esc(d.season)}</span><b>${esc(d.name)}</b><span class="muted">${d.modules.length} модуля: тест по срезам и две задачи</span>${cta('Открыть')}</span>
+          <span class="defense-card__body"><span class="sticker" data-tone="peach">${esc(d.season)}</span><b>${esc(d.name)}</b><span class="muted">Внутри: ${esc(defenseParts(d))}</span>${cta('Открыть')}</span>
         </a>`; }).join('')}</div>`;
     document.title = 'Защиты — inf.family';
   }
@@ -267,27 +277,32 @@
       <section class="defense-hero">
         <img class="defense-hero__cover" src="${esc(INF.coverOf(d).cover)}" alt="Обложка: ${esc(d.name)}" width="840" height="1050">
         <div class="stack" style="--flow:var(--s4)"><span class="sticker" data-tone="peach">${esc(d.season)}</span><h1 tabindex="-1">${esc(d.name)}</h1>
-          <p class="muted">Защита — это проверка знаний за месяц: тест и задачи по пройденному. Здесь можно потренироваться заранее: тест проходится сколько угодно раз, а задачи открываются как условия-картинки.</p>
+          <p class="muted">${hasTest(d)
+            ? 'Защита — это проверка знаний за месяц: тест и задачи по пройденному. Здесь можно потренироваться заранее: тест проходится сколько угодно раз, а задачи открываются как условия-картинки.'
+            : 'Защита — это проверка знаний за месяц: задачи по пройденному. Здесь можно подготовиться заранее: каждая задача открывается как условие-картинка.'}</p>
         </div>
       </section>
-      <div class="section__head" style="margin-top:var(--s7)"><h2>Программа защиты</h2><p class="muted">Тест можно проходить сколько угодно раз. Задачи — это условия-картинки, решения покажет учитель.</p></div>
+      <div class="section__head" style="margin-top:var(--s7)"><h2>Программа защиты</h2><p class="muted">${hasTest(d) ? 'Тест можно проходить сколько угодно раз. ' : ''}Задачи — это условия-картинки, решения покажет учитель.</p></div>
       <div class="bento bento--3">${mods}</div>`;
     document.title = `${d.name} — inf.family`;
   }
 
   function imageTask(root, d, m) {
-    const solution = INF.teacher.on && m.solutionImage;
+    // Учителю: решение-картинка и/или ответ (у части задач есть только ответ)
+    const solution = INF.teacher.on && (m.solutionImage || m.answer);
+    const what = m.solutionImage ? 'решение' : 'ответ';
+    const answer = m.answer ? `<p class="image-task__answer">Ответ: <b>${esc(m.answer)}</b></p>${m.answerNote ? `<p class="muted">${esc(m.answerNote)}</p>` : ''}` : '';
     root.innerHTML = `<a class="back-link" href="#/defense/${d.id}">${icon('arrow-left')}${esc(d.name)}</a>
       <div class="page-head"><span class="chip">${esc(m.tag)}</span><h1 tabindex="-1">${esc(m.name)}</h1></div>
       <figure class="image-task"><img src="${esc(INF.lightImage(m.image))}" alt="${esc(m.imageAlt || 'Условие: ' + m.name)}"><figcaption><a href="${esc(INF.lightImage(m.image))}" target="_blank" rel="noopener">Открыть условие в полном размере</a></figcaption></figure>
-      ${solution ? `<div class="row-actions"><button class="btn btn--primary" type="button" data-solution aria-expanded="false" aria-controls="solution">${icon('lock')}Показать решение</button></div>
-      <figure class="image-task" id="solution" hidden><figcaption class="image-task__label">Решение</figcaption><img src="${esc(INF.lightImage(m.solutionImage))}" alt="${esc(m.solutionAlt || 'Решение: ' + m.name)}"></figure>` : ''}`;
+      ${solution ? `<div class="row-actions"><button class="btn btn--primary" type="button" data-solution aria-expanded="false" aria-controls="solution">${icon('lock')}Показать ${what}</button></div>
+      <figure class="image-task" id="solution" hidden>${m.solutionImage ? '<figcaption class="image-task__label">Решение</figcaption>' : ''}${answer}${m.solutionImage ? `<img src="${esc(INF.lightImage(m.solutionImage))}" alt="${esc(m.solutionAlt || 'Решение: ' + m.name)}">` : ''}</figure>` : ''}`;
     const btn = root.querySelector('[data-solution]');
     btn && btn.addEventListener('click', () => {
       const fig = root.querySelector('#solution');
       fig.hidden = !fig.hidden;
       btn.setAttribute('aria-expanded', String(!fig.hidden));
-      btn.innerHTML = `${icon('lock')}${fig.hidden ? 'Показать решение' : 'Скрыть решение'}`;
+      btn.innerHTML = `${icon('lock')}${fig.hidden ? 'Показать' : 'Скрыть'} ${what}`;
     });
     document.title = `${m.name} — ${d.name} — inf.family`;
   }

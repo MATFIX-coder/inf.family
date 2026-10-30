@@ -257,6 +257,10 @@
 .image-task img { width: 100%; height: auto; border-radius: var(--r-md); border: 1px solid var(--line); background: #fff; }
 .image-task figcaption { margin-top: var(--s2); font-size: var(--fs-sm); }
 .image-task__label { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-lg); margin-bottom: var(--s3); }
+.image-task__answer { font-size: var(--fs-lg); margin: 0 0 var(--s2); }
+.image-task__answer b { font-family: var(--font-code); font-size: 1.15em; }
+.image-task__answer + .muted { margin: 0 0 var(--s3); }
+.image-task__answer:last-child { margin-bottom: 0; }
 
 /* Мой прогресс */
 .progress-list { display: grid; gap: var(--s2); padding: 0; }
