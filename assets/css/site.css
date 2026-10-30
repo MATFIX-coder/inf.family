@@ -16,10 +16,9 @@
 .chips { display: flex; flex-wrap: wrap; gap: var(--s2); }
 .chip--ink { background: rgba(255, 255, 255, 0.45); border-color: transparent; color: var(--ink); }
 
-/* Главный экран: пометка у print() и круглый значок */
+/* Главный экран: пометка у print() */
 .hero-note { position: relative; top: -0.9em; margin-left: 0.35em; font-size: clamp(1.15rem, 0.9rem + 0.8vw, 1.6rem); vertical-align: top; letter-spacing: 0; line-height: 1; white-space: nowrap; }
 .hero-note svg { width: 1.9em; height: 1.4em; display: inline-block; vertical-align: -0.6em; }
-.hero-badge { position: absolute; left: -36px; bottom: 6%; }
 @media (max-width: 760px) { .hero-note { display: none; } }
 
 /* Кнопки на цветной панели (папки) */
@@ -32,6 +31,37 @@
 .switch--ink .switch__track::after { background: #fff; }
 .folder__title { font-size: var(--fs-xl); }
 
+/* Экран тренажёра: панель с главной кнопкой (приглушённый цвет + корешок) и спокойные разделы ниже */
+.panel-title { font-size: var(--fs-xl); }
+.section--tight { padding-top: var(--s6); }
+.section--tight > .panel-title { margin-bottom: var(--s3); }
+.calm-panel {
+  --pad: clamp(18px, 3vw, 28px);
+  position: relative; overflow: hidden;
+  padding: var(--pad) var(--pad) var(--pad) calc(var(--pad) + 12px);
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--tone) 26%, #f7f6fa);
+  color: #1e1b24;
+}
+.calm-panel::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 12px; background: var(--tone); }
+:root[data-theme='dark'] .calm-panel { background: color-mix(in srgb, var(--tone) 16%, #1f1d24); color: #f1eef6; }
+.calm-panel .panel-title + p { margin-top: var(--s2); }
+.calm-panel .stat, .calm-panel .history li { background: color-mix(in srgb, currentColor 7%, transparent); }
+.calm-panel .stat span { color: inherit; opacity: 0.72; }
+.calm-panel .btn--primary { background: #1e1b24; color: #fff; }
+:root[data-theme='dark'] .calm-panel .btn--primary { background: #f1eef6; color: #1e1b24; }
+.calm-panel .btn--secondary { color: inherit; border-color: color-mix(in srgb, currentColor 45%, transparent); }
+.calm-panel .btn--ghost { color: inherit; }
+.calm-panel .switch { color: inherit; }
+.plain-panel { margin: 0; padding: clamp(16px, 2.5vw, 24px); border-radius: 22px; background: var(--surface); border: 1px solid var(--line); }
+.plain-panel .route__item:not(.is-boss), .benefits.plain-panel li { background: var(--surface-2); }
+.plain-panel .route__item:not(.is-boss) small { color: var(--text-3); }
+.benefits.plain-panel { margin-top: 0; }
+
+/* Подписи к значкам счёта, серии и времени */
+.stat-label { color: var(--text-3); font-weight: 500; }
+.task-top__stats b { font-weight: 700; }
+
 /* Экран тренажёра */
 .trainer-head { grid-template-columns: auto 1fr; align-items: center; gap: var(--s5); }
 .trainer-head__glyph {
@@ -40,7 +70,6 @@
   border-radius: 26px;
   background: var(--tone); color: var(--ink);
   font-family: var(--font-code); font-weight: 700; font-size: clamp(1.4rem, 1rem + 1.5vw, 2.2rem);
-  transform: rotate(-4deg);
   box-shadow: var(--shadow-card);
 }
 .benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s4); margin-top: var(--s4); padding: 0; list-style: none; }
@@ -130,7 +159,7 @@
 .match__item:hover { border-color: var(--line-strong); }
 .match__item[aria-pressed='true'] { border-color: var(--text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 25%, transparent); }
 .match__item.is-paired { border-color: var(--tone); background: color-mix(in srgb, var(--tone) 22%, var(--surface)); }
-.match__note { color: var(--text-3); font-size: var(--fs-xs); font-weight: 600; }
+.match__note { color: var(--text-2); font-size: var(--fs-xs); font-weight: 600; }
 
 /* Распределение по группам */
 .sort { display: grid; gap: var(--s3); }
@@ -180,7 +209,7 @@
 
 /* Промежуточный экран раунда */
 .checkpoint { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: var(--s6); align-items: center; padding-top: var(--s7); }
-.checkpoint img { width: 100%; height: auto; border-radius: 32px; box-shadow: var(--shadow-lift); transform: rotate(-2deg); }
+.checkpoint img { width: 100%; height: auto; border-radius: 32px; box-shadow: var(--shadow-lift); }
 .stats--plain .stat { background: var(--surface); border: 1px solid var(--line); }
 .stats--plain .stat span { color: var(--text-3); }
 
@@ -268,11 +297,17 @@
 .cover__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .cover__meta--chip { position: absolute; left: 12px; top: 12px; padding: 4px 10px; border-radius: var(--r-pill); background: rgba(22, 20, 26, 0.72); color: #fff; }
 .block-card--thumb { padding-right: 150px; }
-.block-card__thumb { position: absolute; right: 14px; top: 50%; width: 124px; height: 124px; object-fit: cover; border-radius: 16px; transform: translateY(-50%) rotate(4deg); box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.6); }
+.block-card__thumb { position: absolute; right: 14px; top: 50%; width: 124px; height: 124px; object-fit: cover; border-radius: 16px; transform: translateY(-50%); box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.6); }
+/* На телефоне картинка встаёт над текстом, чтобы не наезжать на кнопку */
+@media (max-width: 560px) {
+  .block-card--thumb { padding-right: 18px; }
+  .block-card--thumb .block-card__thumb { position: static; order: -1; width: 112px; height: 112px; margin-bottom: var(--s2); transform: none; }
+  .block-card--thumb .block-card__thumb.block-card__thumb--robot { width: 120px; height: 150px; transform: none; }
+}
 .defense-card { grid-template-columns: minmax(160px, 260px) minmax(0, 1fr); }
 .defense-card img { aspect-ratio: 4 / 5; }
 .defense-hero { display: grid; grid-template-columns: minmax(200px, 340px) minmax(0, 1fr); gap: var(--s7); align-items: center; padding-top: var(--s5); }
-.defense-hero__cover { width: 100%; height: auto; border-radius: 26px; box-shadow: var(--shadow-lift); transform: rotate(-2deg); }
+.defense-hero__cover { width: 100%; height: auto; border-radius: 26px; box-shadow: var(--shadow-lift); }
 .defense-hero h1 { font-size: var(--fs-2xl); }
 @media (max-width: 760px) {
   .defense-hero { grid-template-columns: minmax(0, 1fr); gap: var(--s5); }

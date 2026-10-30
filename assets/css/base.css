@@ -22,29 +22,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Редкие «искорки» на фоне — как в референсе 1 */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle at 12% 18%, var(--spark) 0 1.2px, transparent 2px),
-    radial-gradient(circle at 84% 12%, var(--spark) 0 1.4px, transparent 2.2px),
-    radial-gradient(circle at 68% 64%, var(--spark) 0 1px, transparent 1.8px),
-    radial-gradient(circle at 26% 82%, var(--spark) 0 1.2px, transparent 2px),
-    radial-gradient(circle at 92% 88%, var(--spark) 0 1px, transparent 1.8px);
-}
-
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.12;
   letter-spacing: -0.01em;
   text-wrap: balance;
 }
-h1 { font-size: var(--fs-hero); font-weight: 800; letter-spacing: -0.02em; }
+h1 { font-size: var(--fs-hero); font-weight: 700; letter-spacing: -0.02em; }
 h2 { font-size: var(--fs-2xl); }
 h3 { font-size: var(--fs-lg); line-height: 1.25; }
 p { text-wrap: pretty; max-width: 68ch; }

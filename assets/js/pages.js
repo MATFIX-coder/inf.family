@@ -22,135 +22,115 @@
       .sort((a, b) => b.run.startedAt - a.run.startedAt)[0] || null;
   }
 
+  // ---------- Карточки разделов: на каждой видно, что это и что будет по нажатию ----------
+  const firstSentence = s => (d => d[0].toUpperCase() + d.slice(1))(s.split(' · ').slice(-1)[0]);
+  const cta = (label, ic = 'arrow-right') => `<span class="t-card__cta">${label}${icon(ic)}</span>`;
+
+  // Тренажёр (вариант А): значок, название, одна строка, одно состояние и кнопка.
+  // Незаконченную попытку кнопка сразу продолжает.
+  function cardState(t) {
+    const e = store.get(t.key), total = t.data.tasks.length, n = `${total} ${engine.taskWord(total)}`;
+    if (e.run && e.run.index < e.run.order.length) return { main: `Задание ${e.run.index + 1} из ${e.run.order.length}`, value: (e.run.index / e.run.order.length) * 100, going: true };
+    if (e.best) return { main: `Лучший результат ${e.best.score} из ${e.best.total}`, value: (e.best.score / e.best.total) * 100 };
+    if (e.last) return { main: n, sub: `повтор ошибок: ${e.last.score} из ${e.last.total}` };
+    return { main: n, sub: 'ещё не начат' };
+  }
+  function trainerCard(t) {
+    const s = cardState(t);
+    return `<a class="tc" data-tone="${t.tone}" href="${s.going ? t.href + '/play' : t.href}">
+      <span class="tc__head"><span class="tc__glyph" aria-hidden="true">${esc(t.glyph)}</span><span class="tc__title">${esc(t.title)}</span></span>
+      <span class="tc__line">${esc(t.short || firstSentence(t.data.cardDescription))}</span>
+      <span class="tc__foot"><span class="tc__state">${esc(s.main)}${s.value ? `<span class="tc__bar"><span style="width:${s.value.toFixed(1)}%"></span></span>` : `<small>${esc(s.sub)}</small>`}</span>${cta(s.going ? 'Продолжить' : 'Открыть')}</span>
+    </a>`;
+  }
+  function trainerGrid() {
+    return `<div class="t-grid">${INF.trainers.filter(t => t.kind === 'block').map(t => trainerCard(t)).join('')}</div>`;
+  }
+  // Защита месяца и игра — отдельные разделы, на главной показываются под тренажёрами
+  function extraCards() {
+    const ar = INF.arcade.summary();
+    return `<div class="x-grid">
+      ${D.catalog.defenseOrder.map(id => { const d = D.defenses[id]; return `
+      <a class="block-card block-card--calm block-card--thumb" data-tone="peach" href="#/defense/${id}">
+        <span class="block-card__meta">Защита месяца</span><span class="block-card__title">${esc(d.name)}</span>
+        <span class="t-card__desc">Проверка знаний за месяц: тест по срезам и две задачи. Готовиться можно заранее.</span>
+        <img class="block-card__thumb" src="${esc(INF.coverOf(d).square)}" alt="" width="160" height="160">
+        <span class="t-card__foot"><span class="t-card__row">${cta('Открыть')}</span></span>
+      </a>`; }).join('')}
+      <a class="block-card block-card--night block-card--thumb" href="#/arcade">
+        <span class="block-card__meta">Игра</span><span class="block-card__title">Python Arcade</span>
+        <span class="t-card__desc">8 игровых автоматов с заданиями. За каждый — жетон, 8 жетонов открывают финальный уровень.</span>
+        <img class="block-card__thumb block-card__thumb--robot" src="assets/img/arcade/robot-wheel.webp" alt="" width="160" height="160">
+        <span class="t-card__foot"><span class="t-card__row"><span class="t-card__status">жетоны ${ar.keys} из 8</span>${cta('Играть')}</span></span>
+      </a>
+    </div>`;
+  }
+
   // ---------- Главная ----------
   function home(root) {
     const r = resumable();
-    const cta = r ? go(`${r.t.href}/play`, `Продолжить «${esc(r.t.title)}»`) : go('#/blocks', 'Выбрать блок');
+    const first = INF.trainers.find(t => t.kind === 'block');
+    const mainAction = r ? go(`${r.t.href}/play`, `Продолжить «${esc(r.t.title)}»`) : go(first.href, `Начать с «${esc(first.title)}»`);
     root.innerHTML = `
       <section class="hero" aria-labelledby="heroTitle">
         <div>
-          <span class="sticker" data-tone="lime" style="--tilt:-3deg">Информатика и Python, 7–11 класс</span>
+          <span class="sticker" data-tone="lime">Информатика и Python, 7–11 класс</span>
           <h1 id="heroTitle" tabindex="-1" style="margin-top:var(--s5)">
             От <span class="code-pill" data-tone="violet" style="--tilt:-3deg">print()</span><span class="hand-note hero-note" aria-hidden="true"><svg viewBox="0 0 54 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M50 30C38 30 22 26 10 14"/><path d="M6 22 8 12l10 1"/></svg>с этого<br>начинает каждый</span><br>
             до <span class="word-pill" data-tone="yellow" style="--tilt:2deg">ЕГЭ</span> —<br>шаг за шагом
           </h1>
           <p class="hero__lead">Тренажёры по Python и информатике для подготовки к ЕГЭ и ОГЭ. Решаешь задание, а если ошибся — смотришь разбор по шагам. Прогресс сохраняется.</p>
-          <div class="hero__actions">${cta}<a class="btn btn--secondary" href="#/progress">Мой прогресс</a></div>
+          <div class="hero__actions">${mainAction}<a class="btn btn--secondary" href="#/progress">Мой прогресс</a></div>
         </div>
         <div class="hero__side">
           <img class="hero__mascot" src="assets/img/brand/mascot.webp" alt="Робот-талисман inf.family машет рукой" width="672" height="900">
-          <div class="round-badge hero-badge" aria-hidden="true">
-            <svg class="round-badge__ring" viewBox="0 0 100 100"><defs><path id="badgePath" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0"/></defs><text><textPath href="#badgePath">решай · ошибайся · разбирайся ·</textPath></text></svg>
-            <span class="btn__go">${icon('arrow-up-right')}</span>
-          </div>
         </div>
       </section>
-      <section class="section" aria-labelledby="rackTitle">
-        <div class="section__head"><h2 id="rackTitle">Выбери, что тренировать</h2>
-          <p class="muted">Потяни полку мышкой или пальцем, листай стрелками. Нажми на центральную обложку — откроется раздел.</p></div>
-        <div class="coverflow" id="rack"><div class="coverflow__stage"></div></div>
-        <div class="coverflow__caption" aria-live="polite"></div>
-        <div class="coverflow__controls">
-          <button class="icon-btn" type="button" data-cf-prev aria-label="Предыдущий раздел">${icon('chevron-left')}</button>
-          <div class="coverflow__dots"></div>
-          <button class="icon-btn" type="button" data-cf-next aria-label="Следующий раздел">${icon('chevron-right')}</button>
-        </div>
+      <section class="section" aria-labelledby="trainersTitle">
+        <div class="section__head"><h2 id="trainersTitle">Тренажёры</h2>
+          <p class="muted">Пять тренажёров: от первых уроков Python до задания 31. Прогресс сохраняется на этом устройстве.</p></div>
+        ${trainerGrid()}
+      </section>
+      <section class="section" aria-labelledby="extrasTitle">
+        <div class="section__head"><h2 id="extrasTitle">Защита месяца и игра</h2></div>
+        ${extraCards()}
       </section>`;
-    const items = INF.trainers.filter(t => t.kind === 'block').map(t => {
-      const s = status(t);
-      const art = INF.coverArt(t.id);
-      return { title: t.title, tone: t.tone, glyph: t.glyph, art, cls: art ? 'cover--calm' : '', meta: `${t.data.tasks.length} ${engine.taskWord(t.data.tasks.length)}`, desc: (d => d[0].toUpperCase() + d.slice(1))(t.data.cardDescription.split(' · ').slice(-1)[0]), rows: [['Заданий', t.data.tasks.length], ['Твой результат', s.text]], href: t.href };
-    });
-    const ar = INF.arcade.summary();
-    items.push({ title: 'Python Arcade', cls: 'cover--night', glyph: '▶', meta: 'Игровой зал', desc: '8 игровых автоматов, жетоны и финальный уровень.', rows: [['Жетоны', `${ar.keys} из 8`], ['Финальный уровень', ar.boss ? 'пройден' : 'впереди']], href: '#/arcade' });
-    D.catalog.defenseOrder.forEach(id => {
-      const d = D.defenses[id];
-      items.push({ title: d.name, tone: 'peach', glyph: d.icon, img: INF.coverOf(d).square, cls: 'cover--image', meta: 'Защита месяца', desc: 'Тест по срезам и две задачи-автомата с решениями.', rows: [['Модулей', d.modules.length], ['Сезон', d.season]], href: `#/defense/${id}` });
-    });
-    const startAt = Math.max(0, items.findIndex(i => r && i.href === r.t.href));
-    ui.coverflow(root.querySelector('#rack'), {
-      items, start: r ? startAt : 2, label: 'Разделы сайта',
-      card: it => it.img
-        ? `<img class="cover__img" src="${esc(it.img)}" alt="" draggable="false"><span class="cover__meta cover__meta--chip">${esc(it.meta)}</span>`
-        : `<span class="cover__meta">${esc(it.meta)}</span>${it.art ? `<span class="cover__art">${it.art}</span>` : `<span class="cover__glyph" aria-hidden="true">${esc(it.glyph)}</span>`}<span class="cover__title">${esc(it.title)}</span>`,
-      caption: it => `<h3>${esc(it.title)}</h3><p>${esc(it.desc)}</p><dl class="cf-meta">${it.rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(String(v))}</dd>`).join('')}</dl><div style="margin-top:var(--s4)">${go(it.href, 'Открыть')}</div>`,
-      onOpen: it => { location.hash = it.href; },
-    });
     document.title = 'inf.family — тренажёры по информатике и Python';
   }
 
-  // ---------- Все блоки ----------
+  // ---------- Все тренажёры ----------
   function blocksPage(root) {
-    const r = resumable();
-    const blocks = INF.trainers.filter(t => t.kind === 'block');
-    const bar = v => `<div class="bar" style="--value:${v}%"><span></span></div>`;
-    const heroT = r ? r.t : blocks[0];
-    const heroS = status(heroT);
-    // Обложка блока: спокойная схема из темы, если она есть; иначе — прежний значок
-    const look = t => { const art = INF.coverArt(t.id); return { cls: art ? ' block-card--calm' : '', art: art ? `<span class="block-card__art">${art}</span>` : `<span class="block-card__glyph" aria-hidden="true">${esc(t.glyph)}</span>` }; };
     root.innerHTML = `
-      <div class="page-head"><h1 tabindex="-1">Блоки</h1><p class="muted">Учебные тренажёры. У каждого — задания, разборы и сохранённый прогресс.</p></div>
-      <div class="bento">
-        <a class="block-card block-card--hero${look(heroT).cls}" data-tone="${heroT.tone}" href="${r ? r.t.href + '/play' : heroT.href}">
-          <span class="block-card__meta">${r ? 'Продолжить с места' : 'С чего начать'}</span>
-          <span class="block-card__title">${esc(heroT.title)}</span>
-          ${look(heroT).art}
-          <span class="block-card__foot">${bar(heroS.value)}<span>${esc(heroS.text)}</span></span>
-        </a>
-        ${blocks.filter(t => t !== heroT).map(t => { const s = status(t); return `
-        <a class="block-card${look(t).cls}" data-tone="${t.tone}" href="${t.href}">
-          <span class="block-card__meta">${t.data.tasks.length} ${engine.taskWord(t.data.tasks.length)}</span>
-          <span class="block-card__title">${esc(t.title)}</span>
-          ${look(t).art}
-          <span class="block-card__foot">${s.value ? bar(s.value) : ''}<span>${esc(s.text)}</span></span>
-        </a>`; }).join('')}
-        <a class="block-card block-card--night block-card--wide" href="#/arcade">
-          <span class="block-card__meta">Игровой зал</span><span class="block-card__title">Python Arcade</span>
-          <span class="block-card__glyph" aria-hidden="true">▶</span><span class="block-card__foot"><span>жетоны ${INF.arcade.summary().keys} из 8</span></span>
-        </a>
-        ${D.catalog.defenseOrder.map(id => { const d = D.defenses[id]; return `
-        <a class="block-card block-card--wide block-card--thumb" data-tone="peach" href="#/defense/${id}">
-          <span class="block-card__meta">Защита месяца</span><span class="block-card__title">${esc(d.name)}</span>
-          <img class="block-card__thumb" src="${esc(INF.coverOf(d).square)}" alt="" width="160" height="160"><span class="block-card__foot"><span>тест по срезам и две задачи</span></span>
-        </a>`; }).join('')}
-      </div>`;
-    document.title = 'Блоки — inf.family';
+      <div class="page-head"><h1 tabindex="-1">Тренажёры</h1><p class="muted">Выбери тренажёр. Задания идут от простого к сложному, после верного ответа — разбор по шагам.</p></div>
+      ${trainerGrid()}`;
+    document.title = 'Тренажёры — inf.family';
   }
 
-  // ---------- Экран тренажёра: вкладки «Мой результат / О тренажёре / Что внутри» ----------
+  // ---------- Экран тренажёра: всё на одной странице, главная кнопка — первой ----------
   function trainerPage(root, t) {
-    const back = t.parent ? `<a class="back-link" href="#/defense/${t.parent.id}">${icon('arrow-left')}${esc(t.parent.name)}</a>` : `<a class="back-link" href="#/blocks">${icon('arrow-left')}Все блоки</a>`;
+    const back = t.parent ? `<a class="back-link" href="#/defense/${t.parent.id}">${icon('arrow-left')}${esc(t.parent.name)}</a>` : `<a class="back-link" href="#/blocks">${icon('arrow-left')}Все тренажёры</a>`;
     const total = t.data.tasks.length;
     const quest = engine.isQuest(t.data);
+    const inside = quest
+      ? `<div class="route">${t.data.rounds.map(r => `
+        <figure class="route__item${r.id === 'boss' ? ' is-boss' : ''}"><img src="${esc(INF.roundImage(r))}" alt="" width="200" height="200" loading="lazy">
+        <figcaption><small>${r.id === 'boss' ? 'Задание 31' : `Раунд ${r.id} · задания ${(r.id - 1) * 5 + 1}–${r.id * 5}`}</small><b>${esc(r.name)}</b></figcaption></figure>`).join('')}</div>`
+      : `<div class="chips">${[...new Set(t.data.tasks.map(x => x.topic))].map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div>`;
     root.innerHTML = `${back}
       <div class="page-head trainer-head" data-tone="${t.tone}">
         <span class="trainer-head__glyph" aria-hidden="true">${esc(t.glyph)}</span>
         <div><h1 tabindex="-1">${esc(t.title)}</h1><p class="muted">${esc(t.data.subtitle)}</p></div>
       </div>
-      <div class="folder" id="folder">
-        <div class="folder__tabs" role="tablist" aria-label="${esc(t.title)}">
-          <button class="folder__tab" role="tab" data-tone="${t.tone}" id="tab-result" aria-controls="panel-result" aria-selected="true">Мой результат</button>
-          <button class="folder__tab" role="tab" data-tone="violet" id="tab-about" aria-controls="panel-about">О тренажёре</button>
-          <button class="folder__tab" role="tab" data-tone="lilac" id="tab-inside" aria-controls="panel-inside">${quest ? 'Маршрут' : 'Что внутри'}</button>
-        </div>
-        <div class="folder__panel" data-tone="${t.tone}" id="panel-result" role="tabpanel" aria-labelledby="tab-result"></div>
-        <div class="folder__panel" data-tone="violet" id="panel-about" role="tabpanel" aria-labelledby="tab-about" hidden>
-          <h2 class="folder__title">${total} ${engine.taskWord(total)}</h2>
-          <ul class="benefits" role="list">${(t.data.benefits || []).map(([h, p]) => `<li><b>${esc(h)}</b><span>${esc(p)}</span></li>`).join('')}</ul>
-        </div>
-        <div class="folder__panel" data-tone="lilac" id="panel-inside" role="tabpanel" aria-labelledby="tab-inside" hidden></div>
-      </div>`;
-    const inside = root.querySelector('#panel-inside');
-    if (quest) {
-      inside.innerHTML = `<h2 class="folder__title">6 раундов и финальный босс</h2><div class="route">${t.data.rounds.map(r => `
-        <figure class="route__item${r.id === 'boss' ? ' is-boss' : ''}"><img src="${esc(INF.roundImage(r))}" alt="" width="200" height="200" loading="lazy">
-        <figcaption><small>${r.id === 'boss' ? 'Задание 31' : `Раунд ${r.id} · задания ${(r.id - 1) * 5 + 1}–${r.id * 5}`}</small><b>${esc(r.name)}</b></figcaption></figure>`).join('')}</div>`;
-    } else {
-      const topics = [...new Set(t.data.tasks.map(x => x.topic))];
-      inside.innerHTML = `<h2 class="folder__title">Темы</h2><div class="chips">${topics.map(x => `<span class="chip chip--ink">${esc(x)}</span>`).join('')}</div>`;
-    }
+      <section class="calm-panel" data-tone="${t.tone}" id="panel-result" aria-label="Мой результат"></section>
+      <section class="section section--tight" aria-labelledby="insideTitle">
+        <h2 id="insideTitle" class="panel-title">${quest ? 'Маршрут: 6 раундов и финальное задание' : `Что внутри: ${total} ${engine.taskWord(total)}`}</h2>
+        <div class="plain-panel">${inside}</div>
+      </section>
+      ${(t.data.benefits || []).length ? `<section class="section section--tight" aria-labelledby="aboutTitle">
+        <h2 id="aboutTitle" class="panel-title">Как устроен тренажёр</h2>
+        <ul class="benefits plain-panel" role="list">${t.data.benefits.map(([h, p]) => `<li><b>${esc(h)}</b><span>${esc(p)}</span></li>`).join('')}</ul>
+      </section>` : ''}`;
     resultPanel(root.querySelector('#panel-result'), t);
-    ui.tabs(root.querySelector('#folder'));
     document.title = `${t.title} — inf.family`;
   }
 
@@ -162,25 +142,25 @@
     const shuffleLabel = quest ? 'Перемешать внутри раундов' : 'Перемешать задания';
     let html = '';
     if (run) {
-      html = `<h2 class="folder__title">${run.mode === 'mistakes' ? 'Повтор ошибок' : 'Попытка идёт'}</h2>
+      html = `<h2 class="panel-title">${run.mode === 'mistakes' ? 'Повтор ошибок' : 'Попытка идёт'}</h2>
         <div class="stats">${stat('Решено', `${run.score} / ${run.order.length}`)}${stat('Сейчас', `задание ${run.index + 1}`)}${stat('Ошибок', run.mistakes.length)}${stat('Время', engine.fmtTime(run.elapsedMs))}</div>
         <div class="row-actions">
           <a class="btn btn--primary" href="${t.href}/play">${icon('play')}Продолжить с ${run.index + 1}-го</a>
-          <button class="btn btn--secondary btn--ink" type="button" data-restart>${icon('rotate')}Начать заново</button>
+          <button class="btn btn--secondary" type="button" data-restart>${icon('rotate')}Начать заново</button>
           <button class="btn btn--danger" type="button" data-reset>${icon('trash')}Сбросить результаты</button>
         </div>`;
     } else {
       const has = e.best || e.last;
-      html = `<h2 class="folder__title">${has ? 'Мои результаты' : 'Пока без попыток'}</h2>
+      html = `<h2 class="panel-title">${has ? 'Мои результаты' : 'Пока без попыток'}</h2>
         ${has ? `<div class="stats">${e.best ? stat('Лучший результат', `${e.best.score} / ${e.best.total}`) : ''}${e.last ? stat('Последняя попытка', `${e.last.score} / ${e.last.total}`) : ''}${e.last ? stat('Ошибок в ней', e.last.mistakes.length) : ''}${e.last ? stat('Время', engine.fmtTime(e.last.timeMs)) : ''}</div>`
         : `<p>Задания идут от простого к сложному. Если ошибёшься — появится подсказка, а после верного ответа — разбор по шагам.</p>`}
         <div class="row-actions">
           <button class="btn btn--primary btn--go" type="button" data-start>${has ? 'Пройти снова' : 'Начать'}<span class="btn__go">${icon('arrow-right')}</span></button>
-          <button class="switch switch--ink" type="button" role="switch" aria-checked="false" data-shuffle><span class="switch__track"></span>${shuffleLabel}</button>
+          <button class="switch" type="button" role="switch" aria-checked="false" data-shuffle><span class="switch__track"></span>${shuffleLabel}</button>
         </div>
-        <div class="row-actions">
-          ${e.last && e.last.mistakes.length ? `<button class="btn btn--secondary btn--ink" type="button" data-mistakes>${icon('rotate')}Повторить ошибки (${e.last.mistakes.length})</button>` : ''}
-          ${e.last ? `<a class="btn btn--ghost btn--ink" href="${t.href}/result">Итоги последней попытки</a>` : ''}
+        <div class="row-actions" ${e.last || has ? '' : 'hidden'}>
+          ${e.last && e.last.mistakes.length ? `<button class="btn btn--secondary" type="button" data-mistakes>${icon('rotate')}Повторить ошибки (${e.last.mistakes.length})</button>` : ''}
+          ${e.last ? `<a class="btn btn--ghost" href="${t.href}/result">Итоги последней попытки</a>` : ''}
           ${has ? `<button class="btn btn--danger" type="button" data-reset>${icon('trash')}Сбросить результаты</button>` : ''}
         </div>
         ${e.history && e.history.length > 1 ? `<details class="history"><summary>История попыток</summary><ol role="list">${e.history.map(h => `<li><span>${dateText(h.date)}</span><span>${h.mode === 'mistakes' ? 'повтор ошибок' : h.mode === 'shuffle' ? 'вперемешку' : 'по порядку'}</span><b class="num">${h.score} / ${h.total}</b><span class="num">${engine.fmtTime(h.timeMs)}</span></li>`).join('')}</ol></details>` : ''}`;
@@ -221,7 +201,7 @@
           <div><b class="num">${l.score}<span>/${l.total}</span></b><small>${percent}%</small></div>
         </div>
         <div class="stack" style="--flow:var(--s4)">
-          <span class="sticker" data-tone="${percent === 100 ? 'mint' : 'yellow'}" style="--tilt:-3deg">${l.mode === 'mistakes' ? 'Повтор ошибок завершён' : 'Попытка завершена'}</span>
+          <span class="sticker" data-tone="${percent === 100 ? 'mint' : 'yellow'}">${l.mode === 'mistakes' ? 'Повтор ошибок завершён' : 'Попытка завершена'}</span>
           <h1 tabindex="-1">${esc(engine.resultText(percent)[0])}</h1>
           <p class="muted">${esc(engine.resultText(percent)[1])}</p>
           <div class="stats stats--plain">
@@ -266,26 +246,27 @@
 
   // ---------- Защиты ----------
   function defensesPage(root) {
-    root.innerHTML = `<div class="page-head"><h1 tabindex="-1">Защиты</h1><p class="muted">Раз в месяц — защита: тест и задачи по пройденному. Здесь можно подготовиться заранее.</p></div>
+    root.innerHTML = `<div class="page-head"><h1 tabindex="-1">Защиты</h1><p class="muted">Раз в месяц ученики защищают пройденное: тест и задачи. Здесь можно подготовиться заранее.</p></div>
       <div class="defense-list">${D.catalog.defenseOrder.map(id => { const d = D.defenses[id]; return `
         <a class="defense-card" href="#/defense/${id}">
           <img src="${esc(INF.coverOf(d).cover)}" alt="Обложка: ${esc(d.name)}" width="840" height="1050">
-          <span class="defense-card__body"><span class="sticker" data-tone="peach" style="--tilt:-2deg">${esc(d.season)}</span><b>${esc(d.name)}</b><span class="muted">${d.modules.length} модуля: тест по срезам и две задачи</span></span>
+          <span class="defense-card__body"><span class="sticker" data-tone="peach">${esc(d.season)}</span><b>${esc(d.name)}</b><span class="muted">${d.modules.length} модуля: тест по срезам и две задачи</span>${cta('Открыть')}</span>
         </a>`; }).join('')}</div>`;
     document.title = 'Защиты — inf.family';
   }
 
   function defensePage(root, d) {
     const mods = d.modules.map(m => {
-      if (m.type === 'image') return `<a class="block-card" data-tone="peach" href="#/defense/${d.id}/${m.id}"><span class="block-card__meta">Задача-картинка</span><span class="block-card__title">${esc(m.name)}</span><span class="block-card__glyph" aria-hidden="true">${esc(m.icon)}</span><span class="block-card__foot"><span>${esc(m.tag)}</span></span></a>`;
+      if (m.type === 'image') return `<a class="block-card block-card--calm" data-tone="peach" href="#/defense/${d.id}/${m.id}"><span class="block-card__meta">Задача-картинка</span><span class="block-card__title">${esc(m.name)}</span><span class="block-card__glyph" aria-hidden="true">${esc(m.icon)}</span><span class="t-card__foot"><span class="t-card__row"><span class="t-card__status">${esc(m.tag)}</span>${cta('Открыть')}</span></span></a>`;
       const t = INF.trainers.find(x => x.id === m.id);
       const s = status(t);
-      return `<a class="block-card block-card--wide" data-tone="mint" href="${t.href}"><span class="block-card__meta">${m.tasks.length} ${engine.taskWord(m.tasks.length)}</span><span class="block-card__title">${esc(m.name)}</span><span class="block-card__glyph" aria-hidden="true">${esc(m.icon)}</span><span class="block-card__foot">${s.value ? `<div class="bar" style="--value:${s.value}%"><span></span></div>` : ''}<span>${esc(s.text)}</span></span></a>`;
+      const going = s.e.run && s.e.run.index < s.e.run.order.length;
+      return `<a class="block-card block-card--calm block-card--wide" data-tone="mint" href="${going ? t.href + '/play' : t.href}"><span class="block-card__meta">${m.tasks.length} ${engine.taskWord(m.tasks.length)}</span><span class="block-card__title">${esc(m.name)}</span><span class="block-card__glyph" aria-hidden="true">${esc(m.icon)}</span><span class="t-card__foot">${s.value ? `<div class="bar" style="--value:${s.value}%"><span></span></div>` : ''}<span class="t-card__row"><span class="t-card__status">${esc(s.text)}</span>${cta(going ? 'Продолжить' : 'Открыть')}</span></span></a>`;
     }).join('');
     root.innerHTML = `<a class="back-link" href="#/defenses">${icon('arrow-left')}Все защиты</a>
       <section class="defense-hero">
         <img class="defense-hero__cover" src="${esc(INF.coverOf(d).cover)}" alt="Обложка: ${esc(d.name)}" width="840" height="1050">
-        <div class="stack" style="--flow:var(--s4)"><span class="sticker" data-tone="peach" style="--tilt:-3deg">${esc(d.season)}</span><h1 tabindex="-1">${esc(d.name)}</h1>
+        <div class="stack" style="--flow:var(--s4)"><span class="sticker" data-tone="peach">${esc(d.season)}</span><h1 tabindex="-1">${esc(d.name)}</h1>
           <p class="muted">Защита — это проверка знаний за месяц: тест и задачи по пройденному. Здесь можно потренироваться заранее: тест проходится сколько угодно раз, а задачи открываются как условия-картинки.</p>
         </div>
       </section>
@@ -319,7 +300,7 @@
       const when = e.run ? 'сейчас' : e.history && e.history[0] ? dateText(e.history[0].date) : '—';
       return `<li class="progress-row" data-tone="${t.tone}">
         <span class="progress-row__dot" aria-hidden="true">${esc(t.glyph)}</span>
-        <span class="progress-row__name"><b>${esc(t.title)}</b><small class="muted">${esc(t.parent ? t.parent.name : 'Блок')}</small></span>
+        <span class="progress-row__name"><b>${esc(t.title)}</b><small class="muted">${esc(t.parent ? t.parent.name : 'Тренажёр')}</small></span>
         <span class="progress-row__state">${esc(s.text)}</span>
         <span class="progress-row__when muted small">${esc(when)}</span>
         <span class="progress-row__actions"><a class="btn btn--secondary" href="${t.href}">Открыть</a>${e.run || e.last ? `<button class="icon-btn" type="button" data-reset="${esc(t.key)}" aria-label="Сбросить результаты «${esc(t.title)}»">${icon('trash')}</button>` : ''}</span>
@@ -353,7 +334,7 @@
       }
     });
     root.querySelector('[data-reset-all]').addEventListener('click', async () => {
-      if (await ui.confirm({ title: 'Сбросить весь прогресс?', text: 'Удалятся результаты всех блоков, тестов и игры Python Arcade на этом устройстве. Отменить это нельзя.', confirm: 'Сбросить всё', danger: true })) {
+      if (await ui.confirm({ title: 'Сбросить весь прогресс?', text: 'Удалятся результаты всех тренажёров, тестов и игры Python Arcade на этом устройстве. Отменить это нельзя.', confirm: 'Сбросить всё', danger: true })) {
         store.resetAll(); INF.arcade.reset(); ui.toast('Весь прогресс сброшен', 'trash'); progressPage(root);
       }
     });

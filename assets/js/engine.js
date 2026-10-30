@@ -100,9 +100,9 @@
         <a class="back-link" href="${trainer.href}">${icon('arrow-left')}${esc(trainer.title)}</a>
         <span class="task-top__stats">
           <span><b>${esc(counter)}</b>${esc(mode)}</span>
-          <span class="num" title="Счёт">${icon('check-circle')}<span data-score>${run.score} / ${total}</span></span>
-          <span class="num" title="Серия верных ответов подряд">${icon('flame')}<span data-streak>${run.streak}</span></span>
-          <span class="num" title="Время">${icon('clock')}<span data-timer>${fmtTime(run.elapsedMs)}</span></span>
+          <span class="num">${icon('check-circle')}<span class="stat-label">Решено</span><b data-score>${run.score} / ${total}</b></span>
+          <span class="num" title="Верных ответов подряд">${icon('flame')}<span class="stat-label">Серия</span><b data-streak>${run.streak}</b></span>
+          <span class="num">${icon('clock')}<span class="stat-label">Время</span><b data-timer>${fmtTime(run.elapsedMs)}</b></span>
         </span>
       </div>
       <div class="bar" role="progressbar" aria-label="Пройдено заданий" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${run.index}" style="--value:${(run.index / total) * 100}%"><span></span></div>
@@ -520,7 +520,7 @@
     root.innerHTML = `<div class="checkpoint" data-tone="${trainer.tone}">
       <img src="${esc(INF.roundImage(r))}" alt="" width="320" height="320">
       <div class="stack" style="--flow:var(--s4)">
-        <span class="sticker" data-tone="lime" style="--tilt:-3deg">${icon('sparkle')}Раунд ${esc(r.id)} пройден</span>
+        <span class="sticker" data-tone="lime">${icon('sparkle')}Раунд ${esc(r.id)} пройден</span>
         <h1 tabindex="-1">${esc(r.name)}</h1>
         <p class="muted">${esc(r.after)}</p>
         <div class="stats stats--plain">
@@ -559,7 +559,7 @@
   // ---------- Текст итога для куратора ----------
   // Оценка результата: короткий заголовок и пояснение (смысл — как в старом сайте)
   function resultText(percent) {
-    if (percent === 100) return ['Все задания решены', 'Можно браться за следующий блок.'];
+    if (percent === 100) return ['Все задания решены', 'Можно браться за следующий тренажёр.'];
     if (percent >= 80) return ['Сильный результат', 'Повтори ошибки — и будет идеально.'];
     if (percent >= 60) return ['Основа есть', 'Повтори ошибки, чтобы закрепить тему.'];
     return ['Есть что повторить', 'После разбора ошибок результат можно быстро улучшить.'];

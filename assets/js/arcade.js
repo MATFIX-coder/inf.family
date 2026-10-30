@@ -90,18 +90,18 @@
     game.root.innerHTML = `<div class="ar-hall">
       <section class="arcade-screen ar-hero">
         <div class="ar-hero__text">
-          <span class="sticker" data-tone="lime" style="--tilt:-3deg">Игровой зал</span>
+          <span class="sticker" data-tone="lime">Игровой зал</span>
           <h1 tabindex="-1">Python Arcade</h1>
           <p>Восемь игровых автоматов. За каждый — жетон: реши три разных задания (сейф — открой один раз). Восемь жетонов открывают финальный уровень.</p>
           <div class="row-actions">
             <a class="btn btn--tone btn--go" data-tone="${n === 8 ? 'yellow' : info(nextMode).tone}" href="#/arcade/${nextMode}">${n === 8 ? 'На финальный уровень' : `Играть: ${esc(info(nextMode).name)}`}<span class="btn__go" style="background:var(--ink);color:#fff">${icon('arrow-right')}</span></a>
-            <a class="btn btn--secondary ar-btn-light" href="#/arcade/review" ${saved.mistakes.length ? '' : 'aria-disabled="true" data-disabled'}>${icon('rotate')}Повторить ошибки (${unresolved})</a>
+            ${saved.mistakes.length ? `<a class="btn btn--secondary ar-btn-light" href="#/arcade/review">${icon('rotate')}Повторить ошибки${unresolved ? ` (${unresolved})` : ''}</a>` : ''}
           </div>
         </div>
         <div class="ar-hero__side">
           <div class="tokens tokens--big" role="img" aria-label="Жетоны: ${n} из 8">${MODES.map(m => `<span class="token${completed(m.id) ? ' is-on' : ''}" title="${esc(m.name)}"></span>`).join('')}</div>
           <p class="ar-dim">${n} из 8 жетонов</p>
-          <dl class="ar-stats"><div><dt>Решено</dt><dd>${saved.solved.length}</dd></div><div><dt>Попыток</dt><dd>${saved.attempts}</dd></div><div><dt>Лучшая серия</dt><dd>${saved.bestStreak}</dd></div><div><dt>Пропусков</dt><dd>${saved.skipped}</dd></div></dl>
+          <dl class="ar-stats"><div><dt>Решено заданий</dt><dd>${saved.solved.length}</dd></div><div><dt>Лучшая серия</dt><dd>${saved.bestStreak}</dd></div></dl>
         </div>
       </section>
 
@@ -125,12 +125,12 @@
 
       <section class="section" aria-labelledby="arBonusTitle">
         <div class="section__head"><h2 id="arBonusTitle">Бонус-зал</h2><p class="muted">Лаборатории для тренировки. Жетонов не дают — просто играй.</p></div>
-        <div class="ar-bonus">${EXTRAS.map(m => `<a class="block-card" data-tone="${m.tone}" href="#/arcade/${m.id}"><span class="block-card__meta">Лаборатория</span><span class="block-card__title">${esc(m.name)}</span><span class="block-card__foot"><span>${esc(m.desc)}</span></span></a>`).join('')}</div>
+        <div class="ar-bonus">${EXTRAS.map(m => `<a class="block-card block-card--calm" data-tone="${m.tone}" href="#/arcade/${m.id}"><span class="block-card__meta">Лаборатория</span><span class="block-card__title">${esc(m.name)}</span><span class="t-card__desc">${esc(m.desc)}</span><span class="t-card__foot"><span class="t-card__row"><span class="t-card__cta">Играть${icon('arrow-right')}</span></span></span></a>`).join('')}</div>
       </section>
 
       <section class="ar-settings">
-        <div><b>Сложность банка</b><p class="muted small">Сложность не сбрасывает прогресс. В «Разминке» автоматы без простых заданий берут задания своего уровня.</p></div>
-        <div class="segmented" role="radiogroup" aria-label="Сложность банка" id="arLevel">
+        <div><b>Сложность заданий</b><p class="muted small">Какие задания попадаются в автоматах. При смене сложности жетоны и прогресс сохраняются.</p></div>
+        <div class="segmented" role="radiogroup" aria-label="Сложность заданий" id="arLevel">
           ${[[1, 'Разминка'], [2, 'Обычный'], [3, 'Все уровни']].map(([v, l]) => `<button type="button" role="radio" aria-checked="${saved.difficulty === v}" data-level="${v}">${l}</button>`).join('')}
         </div>
         <p class="muted small">Жетоны и статистика хранятся в этом браузере.</p>
@@ -148,7 +148,6 @@
       game.root.querySelectorAll('[data-level]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
       ui.toast(`Сложность: ${b.textContent}`, 'sparkle');
     }));
-    game.root.querySelector('[data-disabled]')?.addEventListener('click', e => { e.preventDefault(); ui.toast('Ошибок пока нет — повторять нечего', 'check'); });
     document.title = 'Python Arcade — inf.family';
   }
 
@@ -161,7 +160,7 @@
     game.root.innerHTML = `<div class="ar-station" data-tone="${m.tone}">
       <div class="ar-top">
         <a class="back-link" href="#/arcade">${icon('arrow-left')}Зал автоматов</a>
-        <span class="task-top__stats"><span class="num" title="Серия верных ответов подряд">${icon('flame')}<span data-streak>${saved.streak}</span></span><span class="num">${icon('sparkle')}${keys()} / 8</span></span>
+        <span class="task-top__stats"><span class="num" title="Верных ответов подряд">${icon('flame')}<span class="stat-label">Серия</span><b data-streak>${saved.streak}</b></span><span class="num">${icon('sparkle')}<span class="stat-label">Жетоны</span><b>${keys()} / 8</b></span></span>
       </div>
       <div class="ar-layout">
         <aside class="ar-robot">
@@ -789,7 +788,7 @@
     game.root.innerHTML = `<section class="arcade-screen ar-finish">
       <img class="ar-finish__robot" src="assets/img/brand/mascot.webp" alt="" width="672" height="900">
       <div class="stack" style="--flow:var(--s4)">
-        <span class="sticker" data-tone="${saved.boss ? 'yellow' : 'lime'}" style="--tilt:-3deg">${saved.boss ? 'Миссия выполнена' : 'Сеанс завершён'}</span>
+        <span class="sticker" data-tone="${saved.boss ? 'yellow' : 'lime'}">${saved.boss ? 'Миссия выполнена' : 'Сеанс завершён'}</span>
         <h1 tabindex="-1">${saved.boss ? 'Финальный уровень пройден' : 'Код становится точнее'}</h1>
         <div class="tokens tokens--big" role="img" aria-label="Жетоны: ${n} из 8">${MODES.map(m => `<span class="token${completed(m.id) ? ' is-on' : ''}"></span>`).join('')}</div>
         <p class="ar-dim">${n} из 8 жетонов · финальный уровень ${saved.boss ? 'пройден' : 'ещё ждёт'} · ${remaining} ${remaining === 1 ? 'задание' : remaining < 5 && remaining > 0 ? 'задания' : 'заданий'} для закрепления</p>

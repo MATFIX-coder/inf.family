@@ -173,7 +173,7 @@
   font-weight: 600;
   font-size: var(--fs-sm);
   line-height: 1.2;
-  transform: rotate(var(--tilt, -3deg));
+  transform: rotate(var(--tilt, 0deg));
   box-shadow: 0 2px 0 rgba(22, 20, 26, 0.18);
 }
 .sticker svg { width: 16px; height: 16px; }
@@ -282,7 +282,7 @@
   overflow: hidden;
   transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base);
 }
-a.block-card:hover, button.block-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+a.block-card:hover, button.block-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
 .block-card__glyph {
   position: absolute;
   right: -6px; bottom: -14px;
@@ -337,6 +337,71 @@ a.block-card:hover, button.block-card:hover { transform: translateY(-3px); box-s
 .cover__art { flex: 1; min-height: 0; display: grid; place-items: center; }
 .block-card__art { display: block; width: min(100%, 210px); margin: var(--s2) 0; }
 .block-card--hero .block-card__art { width: min(100%, 300px); margin: auto 0; }
+
+/* ===================== Карточка тренажёра (вариант А): значок, название, строка, состояние, кнопка ===================== */
+/* 5 карточек одного размера: 3 в первом ряду, 2 во втором */
+.t-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--s3); }
+.t-grid > :nth-child(-n+3) { grid-column: span 2; }
+.t-grid > :nth-child(n+4) { grid-column: span 3; }
+.x-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
+.tc {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 10px;
+  min-height: 196px; padding: 20px 20px 18px 30px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--tone) 22%, var(--surface));
+  color: var(--text); text-decoration: none;
+  transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base);
+}
+.tc::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 10px; background: var(--tone); }
+:root[data-theme='dark'] .tc { background: color-mix(in srgb, var(--tone) 14%, var(--surface)); }
+.tc:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.tc__head { display: flex; align-items: center; gap: 12px; }
+.tc__glyph { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--tone); color: var(--ink); font: 700 15px/1 var(--font-code); }
+.tc__title { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; line-height: 1.2; }
+.tc__line { color: var(--text-2); font-size: var(--fs-sm); }
+.tc__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s3); margin-top: auto; padding-top: var(--s3); }
+.tc__state { font-size: var(--fs-sm); font-weight: 600; }
+.tc__state small { display: block; font-size: var(--fs-xs); font-weight: 500; color: var(--text-2); }
+.tc__bar { display: block; width: 140px; max-width: 100%; height: 4px; margin-top: 8px; border-radius: var(--r-pill); background: color-mix(in srgb, currentColor 14%, transparent); overflow: hidden; }
+.tc__bar span { display: block; height: 100%; border-radius: inherit; background: var(--tone); }
+.tc .t-card__cta { background: var(--text); color: var(--surface); }
+.tc:hover .t-card__cta svg { transform: translateX(3px); }
+
+/* Кнопки и подписи на остальных карточках (защита, игра, бонус-зал) */
+.t-card__desc { font-size: var(--fs-sm); line-height: 1.45; opacity: 0.8; }
+.t-card__foot { margin-top: auto; padding-top: var(--s3); display: grid; gap: 8px; }
+.t-card__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s3); }
+.t-card__status { font-size: var(--fs-xs); font-weight: 600; opacity: 0.8; }
+.t-card__cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px; padding: 0 16px; margin-left: auto;
+  border-radius: var(--r-pill);
+  background: #1e1b24; color: #fff;
+  font-size: var(--fs-sm); font-weight: 700;
+}
+.t-card__cta svg { width: 16px; height: 16px; transition: transform var(--t-fast) var(--ease-out); }
+:is(a.block-card, a.defense-card):hover .t-card__cta svg { transform: translateX(3px); }
+:root[data-theme='dark'] .block-card--calm .t-card__cta, .block-card--night .t-card__cta { background: #f1eef6; color: #1e1b24; }
+.block-card--night .t-card__desc { opacity: 0.75; }
+.block-card:has(.t-card__cta) .block-card__glyph { display: none; } /* за кнопкой бледный значок только мешает */
+.block-card__thumb.block-card__thumb--robot { top: 12px; bottom: 12px; width: 130px; height: calc(100% - 24px); object-fit: contain; object-position: center bottom; border-radius: 0; box-shadow: none; transform: none; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.45)); }
+@media (max-width: 980px) { .t-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .t-grid > * { grid-column: auto !important; } }
+@media (max-width: 560px) { .t-grid, .x-grid { grid-template-columns: minmax(0, 1fr); } .tc { min-height: 0; } }
+@media (max-width: 760px) { .x-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Кнопка учителя — тихая: ученику туда не нужно */
+.teacher-btn { color: var(--text-3); font-weight: 600; }
+.teacher-btn svg { width: 18px; height: 18px; }
+.teacher-btn.is-on { background: var(--lime); color: var(--ink); }
+:root[data-theme='dark'] .teacher-btn { border-color: var(--line-strong); color: var(--text-2); } /* на тёмном фоне без рамки кнопка теряется */
+/* Планшет: меню и кнопки шапки должны помещаться в одну строку */
+@media (max-width: 1100px) and (min-width: 761px) {
+  .nav-pill a { padding: 9px 12px; }
+  .teacher-btn { width: 44px; min-height: 44px; padding: 0; justify-content: center; }
+  .teacher-btn .btn__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+@media (max-width: 860px) and (min-width: 761px) { .nav-pill a { padding: 9px 9px; } }
 
 /* ===================== Карусель-«полка» (coverflow) ===================== */
 .coverflow {
@@ -441,6 +506,11 @@ a.block-card:hover, button.block-card:hover { transform: translateY(-3px); box-s
   counter-reset: line;
 }
 .code .ln { display: block; padding: 0 20px 0 0; white-space: pre; }
+/* Телефон: длинная строка кода переносится под своё начало (правее номера), а не прячется за краем */
+@media (max-width: 560px) {
+  .code { font-size: 0.88rem; }
+  .code .ln { white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 14px 0 3.2em; text-indent: -3.2em; }
+}
 .code .ln::before {
   counter-increment: line;
   content: counter(line);
@@ -528,9 +598,10 @@ a.block-card:hover, button.block-card:hover { transform: translateY(-3px); box-s
 .explain__head h3 { font-size: var(--fs-lg); }
 .explain__main { font-size: var(--fs-lg); line-height: 1.45; font-weight: 500; max-width: 60ch; }
 
-.strip-wrap { margin-top: var(--s5); overflow-x: auto; padding-bottom: 4px; }
-.strip-name { font-family: var(--font-code); font-size: var(--fs-sm); color: var(--text-2); margin-bottom: 6px; }
-.strip { display: flex; gap: 4px; width: max-content; }
+.strip-wrap { margin-top: var(--s5); padding-bottom: 4px; }
+.strip-name { font-family: var(--font-code); font-size: var(--fs-sm); color: var(--text-2); margin-bottom: 6px; overflow-wrap: anywhere; }
+/* Длинная строка переносится на следующий ряд — вся строка видна, без скрытой прокрутки */
+.strip { display: flex; flex-wrap: wrap; gap: 8px 4px; }
 .strip__cell { display: grid; justify-items: center; gap: 3px; font-family: var(--font-code); }
 .strip__cell small { font-size: 11px; color: var(--text-3); line-height: 1; }
 .strip__cell b {
@@ -546,6 +617,11 @@ a.block-card:hover, button.block-card:hover { transform: translateY(-3px); box-s
 .strip__cell.is-space b { color: var(--text-3); }
 .strip__cell.is-on b { background: var(--tone, var(--mint)); color: var(--ink); border-color: transparent; transform: translateY(-3px); }
 .strip__cell.is-on small { color: var(--text); font-weight: 700; }
+@media (max-width: 560px) {
+  .strip { gap: 8px 2px; }
+  .strip__cell b { width: 23px; height: 32px; border-radius: 7px; font-size: 0.9rem; }
+  .strip__cell small { font-size: 10px; }
+}
 
 .steps { counter-reset: step; display: grid; gap: var(--s3); margin-top: var(--s5); padding: 0; list-style: none; }
 .steps li { position: relative; padding-left: 40px; line-height: 1.55; }

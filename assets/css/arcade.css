@@ -39,7 +39,7 @@
 
 .coverflow--arcade { --cf-w: clamp(150px, 19vw, 230px); }
 .cover--robot { padding: 14px; align-items: center; }
-.cover--robot .cover__meta { align-self: flex-start; }
+.cover--robot .cover__meta { align-self: flex-start; color: var(--ink); }
 .cover__robot { flex: 1; min-height: 0; width: 86%; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.28)); pointer-events: none; }
 .cover--robot .cover__title { align-self: flex-start; }
 .pips--light { justify-content: center; margin-top: var(--s3); }
@@ -68,6 +68,8 @@
 .ar-panel { padding: clamp(20px, 3vw, 32px); min-height: 420px; }
 .ar-kicker { font-size: var(--fs-sm); font-weight: 600; color: var(--tone); }
 .ar-panel h1 { font-size: var(--fs-2xl); margin: 4px 0 var(--s5); }
+/* На невысоком экране ноутбука главная кнопка автомата должна быть видна без прокрутки */
+@media (max-height: 820px) { .ar-panel h1 { font-size: var(--fs-xl); margin-bottom: var(--s3); } .ar-panel .ar-wheel { width: min(100%, 340px, 36vh); } .ar-panel .row-actions { margin-top: var(--s3); } }
 .ar-chip { background: rgba(255, 255, 255, 0.06); border-color: transparent; color: var(--text-2); }
 .ar-prompt { font-size: var(--fs-lg); line-height: 1.45; }
 .ar-target { background: var(--yellow); color: var(--ink); }
@@ -105,7 +107,7 @@
 .ar-editor:focus-visible { outline: none; border-color: var(--focus); }
 
 /* Колесо */
-.ar-wheel { position: relative; width: min(100%, 340px); margin: var(--s4) auto 0; aspect-ratio: 1; }
+.ar-wheel { position: relative; width: min(100%, 340px, 40vh); min-width: 220px; margin: var(--s4) auto 0; aspect-ratio: 1; }
 .ar-wheel__disc { width: 100%; height: 100%; transition: transform 2.5s cubic-bezier(0.17, 0.67, 0.12, 1); filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.5)); }
 .ar-wheel__disc text { font-family: var(--font-display); font-size: 12px; font-weight: 700; fill: #16141a; }
 .ar-wheel__disc .ar-wheel__hub { fill: #f4f2ee; font-family: var(--font-code); font-size: 16px; }
@@ -121,6 +123,7 @@
 
 /* Срезы и тир */
 .ar-strip .strip__cell b { width: 40px; height: 48px; font-size: 1.2rem; }
+@media (max-width: 560px) { .ar-strip { gap: 8px 2px; } .ar-strip .strip__cell b { width: 24px; height: 34px; font-size: 0.95rem; border-radius: 7px; } }
 .ar-strip .strip__cell.is-on b { background: var(--tone); color: var(--ink); border-color: transparent; transform: translateY(-3px); }
 .ar-strip .strip__cell.is-hit b { background: var(--yellow); color: var(--ink); border-color: transparent; transform: translateY(-4px) scale(1.06); box-shadow: 0 0 0 4px rgba(255, 216, 77, 0.25); }
 .ar-slice-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); }

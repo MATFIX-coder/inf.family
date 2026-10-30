@@ -38,8 +38,8 @@
   --fs-md: 1.0625rem;   /* 17 — основной текст */
   --fs-lg: 1.3125rem;   /* 21 */
   --fs-xl: clamp(1.5rem, 1.2rem + 1vw, 1.875rem);
-  --fs-2xl: clamp(1.875rem, 1.3rem + 2.2vw, 2.75rem);
-  --fs-hero: clamp(2.25rem, 1.2rem + 4.4vw, 4.5rem);
+  --fs-2xl: clamp(1.75rem, 1.3rem + 1.8vw, 2.4rem);
+  --fs-hero: clamp(2.1rem, 1.2rem + 3.4vw, 3.75rem);
 
   /* Отступы: шаг 4 px */
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px; --s9: 112px;

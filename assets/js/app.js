@@ -6,16 +6,17 @@
   const E = D.explanations || {};
 
   // ---------- Тренажёры: блоки и интерактивные модули защит ----------
+  // short — одна строка для карточки тренажёра (вариант А, выбор пользователя 23.10.2026)
   const LOOK = {
-    python: { tone: 'yellow', glyph: 'Py' },
-    basics: { tone: 'lilac', glyph: 'a=1' },
-    slices: { tone: 'mint', glyph: '[::]' },
-    units: { tone: 'coral', glyph: '8b' },
-    infquest31: { tone: 'sky', glyph: '31' },
+    python: { tone: 'yellow', glyph: 'Py', short: 'Читаешь код и пишешь, что он выведет' },
+    basics: { tone: 'lilac', glyph: 'a=1', short: 'Типы данных, строки, print() и первые срезы' },
+    slices: { tone: 'mint', glyph: '[::]', short: 'Индексы, срезы и методы строк' },
+    units: { tone: 'coral', glyph: '8b', short: 'Переводы бит, байт, Кбит и Кбайт' },
+    infquest31: { tone: 'sky', glyph: '31', short: '6 раундов и финальное задание 31' },
   };
   INF.trainers = D.catalog.blockOrder.map(id => ({
     key: `block:${id}`, kind: 'block', id, data: D.blocks[id], title: D.blocks[id].name,
-    tone: (LOOK[id] || {}).tone || 'violet', glyph: (LOOK[id] || {}).glyph || D.blocks[id].icon,
+    tone: (LOOK[id] || {}).tone || 'violet', glyph: (LOOK[id] || {}).glyph || D.blocks[id].icon, short: (LOOK[id] || {}).short || '',
     href: `#/block/${id}`, explanations: (E.blocks || {})[id] || {},
   }));
   D.catalog.defenseOrder.forEach(did => {
@@ -47,7 +48,7 @@
   function syncTeacherButton() {
     teacherBtn.classList.toggle('is-on', INF.teacher.on);
     teacherBtn.setAttribute('aria-pressed', String(INF.teacher.on));
-    teacherBtn.querySelector('.btn__label').textContent = INF.teacher.on ? 'Учитель ✓' : 'Учитель';
+    teacherBtn.querySelector('.btn__label').textContent = INF.teacher.on ? 'Учитель ✓' : 'Для учителя';
   }
   function askCode() {
     return new Promise(resolve => {
